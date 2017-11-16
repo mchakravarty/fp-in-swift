@@ -1,0 +1,121 @@
+//
+//  GoalsController.swift
+//  Goals
+//
+//  Created by Manuel M T Chakravarty on 17/07/2016.
+//  Copyright © 2016 Chakravarty & Keller. All rights reserved.
+//
+
+import UIKit
+
+
+private let kShowGoalDetail = "ShowGoalDetail"    // Segue identifier
+
+/// Tracks the UI state of the table view.
+///
+private enum GoalsEditState {
+  case displaying
+  case editing(goalsActivity: [Bool])
+}
+
+class GoalsController: UITableViewController {
+
+  private var editState: GoalsEditState = .displaying
+  private var addButton: UIBarButtonItem?               // Keep the button around while removed from the UI.
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+
+      // Keep a reference to the add button; so, we can remove it temporarily from the UI during edit mode.
+    addButton = navigationItem.leftBarButtonItem
+
+      // Display an Edit button in the navigation bar for this view controller.
+    navigationItem.rightBarButtonItem = editButtonItem
+  }
+
+  // This is awkward — see caller.
+  func deleteItem(at idx: Int) {
+    switch editState {
+    case .displaying: ()
+    case .editing(var goalsActivity):
+      goalsActivity.remove(at: idx)
+      editState = .editing(goalsActivity: goalsActivity)
+    }
+  }
+
+  // MARK: - Managing editing
+
+  override func setEditing(_ editing: Bool, animated: Bool) {
+    guard let goalsDataSource = tableView.dataSource as? GoalsDataSource else { return }
+
+    super.setEditing(editing, animated: animated)
+
+    switch (editing, editState) {
+
+      // We are already in the target state — don't do anything.
+    case (false, .displaying): ()
+    case (true, .editing):     ()
+
+      // Enter edit state.
+    // FIXME: EXERCISE: add appropriate case
+
+      // Leave edit state.
+    // FIXME: EXERCISE: add appropriate case (and remove 'default:')
+    default: ()
+    }
+  }
+
+  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    guard let cell = tableView.cellForRow(at: indexPath) else { return }
+
+      // This operation is only valid in editing state.
+    guard case .editing(var goalsActivity) = editState else { return }
+
+    let newIsActive = !goalsActivity[indexPath.item]              // toggle the current activity state
+    // FIXME: EXERCISE: set 'cell.editingAccessoryType'
+    tableView.deselectRow(at: indexPath, animated: true)
+
+    // FIXME: EXERCISE: update 'goalsActivity'
+    // FIXME: EXERCISE: update 'editState'
+  }
+
+  /*
+  // Override to support rearranging the table view.
+  override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+
+  }
+  */
+
+
+  // MARK: - Interacting with Storyboards and Segues
+
+  override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+    if identifier == kShowGoalDetail { return !isEditing }
+    return false
+  }
+
+  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    guard let goalsDataSource = tableView.dataSource as? GoalsDataSource,
+          let indexPath       = tableView.indexPathForSelectedRow else { return }
+
+    if segue.identifier == kShowGoalDetail, let detailController = segue.destination as? DetailController {
+
+      detailController.goal      = goalsDataSource.goal(at: indexPath)?.goal
+      detailController.goalEdits = goalsDataSource.goalEdits      // Pass goal editing capability along
+    }
+  }
+}
+
+
+// MARK: - Actions
+
+extension GoalsController {
+
+  @IBAction func addGoal(_ sender: AnyObject) {
+    guard let goalsDataSource = tableView.dataSource as? GoalsDataSource else { return }
+
+    if isEditing { return }     // Adding a goal in editing state can lead to inconsistency
+
+    goalsDataSource.add(goal: Goal())
+  }
+}

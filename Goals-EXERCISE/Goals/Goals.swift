@@ -1,0 +1,220 @@
+//
+//  Goals.swift
+//  Goals
+//
+//  Created by Manuel M T Chakravarty on 22/06/2016.
+//  Copyright © [2016..2017] Chakravarty & Keller. All rights reserved.
+//
+//  Model representation
+
+import Foundation
+import UIKit
+
+
+// MARK: Model data structures
+
+/// The set of colours that might be used to render goals.
+///
+let goalColours: [UIColor] = [.blue, .cyan, .green, .yellow, .orange, .red, .purple]
+
+enum GoalInterval: CustomStringConvertible {
+  case daily, weekly, monthly
+
+  var description: String {
+    switch self {
+    case .daily:   return "Daily"
+    case .weekly:  return "Weekly"
+    case .monthly: return "Monthly"
+    }
+  }
+
+  /// Printed frequency for the current time interval, assumming the argument is greater than zero.
+  ///
+  func frequency(number: Int) -> String {
+    var result: String
+
+    switch number {
+    case 1:  result = "once"
+    case 2:  result = "twice"
+    default: result = "\(number) times"
+    }
+    switch self {
+    case .daily:   result += " per day"
+    case .weekly:  result += " per week"
+    case .monthly: result += " per month"
+    }
+    return result
+  }
+}
+
+/// Specification of a single goal
+///
+struct Goal {
+  let uuid:       UUID            // Unique identifier for a specific goal
+
+  var colour:     UIColor
+  var title:      String
+  var interval:   GoalInterval
+  var frequency:  Int             // how often the goal ought to be achieved during the interval
+
+  init(colour: UIColor, title: String, interval: GoalInterval, frequency: Int) {
+    self.uuid      = UUID()
+    self.colour    = colour
+    self.title     = title
+    self.interval  = interval
+    self.frequency = frequency
+  }
+
+  init() { self = Goal(colour: .green, title: "New Goal", interval: .daily, frequency: 1) }
+
+  var frequencyPerInterval: String {
+    // FIXME: use NumberFormatter to print frequency in words
+    return "\(interval.frequency(number: frequency))"
+  }
+
+  /// Percentage towards achieving the goal in the current interval given a specific count of how often the task/activity
+  /// has been done in the current interval.
+  ///
+  func percentage(count: Int) -> Float { return Float(count) / Float(frequency) }
+}
+
+extension Goal {
+  static func ===(lhs: Goal, rhs: Goal) -> Bool { return lhs.uuid == rhs.uuid }
+}
+
+/// A goal and the progress towards that goal in an interval. Only active goals make progress.
+///
+typealias GoalProgress = (goal: Goal, progress: Int?)
+
+/// Specification of a collection of goals with progress — complete, immutable model state.
+///
+/// * The order of the goals in the array determines their order on the overview screen.
+///
+/// NB: If the number of entries in this array was bigger, it would be more efficient to use a dictionary indexed by
+///     goals (or rather their UUID), but as it is, an array suffices and also matches the ordering of the goals in UI.
+///
+typealias Goals = [GoalProgress]
+
+/// Adjust the progress component of goals with progress according to the activity array.
+///
+/// Precondition: the activities array has at least as many entries as the goals array
+///
+func mergeActivity(goals: Goals, activity: [Bool]) -> Goals {
+  return zip(goals, activity).map{ goal, isActive in
+
+    // FIXME: EXERCISE: replace next line by appropriate code
+    return goal
+  }
+}
+
+
+// MARK: -
+// MARK: Goals edits
+
+/// This type encompases all transformations that may be applied to goals except advancing the progress counts in values
+/// of type `Goals`.
+///
+enum GoalEdit {
+  case add(goal: Goal)
+  case delete(goal: Goal)
+  case update(goal: Goal)
+  case setActivity(activity: [Bool])
+}
+
+extension GoalEdit {
+
+  func transform(_ goals: Goals) -> Goals {
+
+    // FIXME: EXERCISE: replace next line by appropriate code
+    return goals
+  }
+}
+
+/// Type of a stream of goal edits.
+///
+typealias GoalEdits = Changes<GoalEdit>
+
+
+// MARK: -
+// MARK: Progress edits
+
+/// This type captures the transformations that advance goal progress.
+///
+enum ProgressEdit {
+  case bump(goal: Goal)
+}
+
+extension ProgressEdit {
+
+  func transform(_ goals: Goals) -> Goals {
+
+    // FIXME: EXERCISE: replace next line by appropriate code
+    return goals
+  }
+}
+
+/// Type of a stream of progress edits.
+///
+typealias ProgressEdits = Changes<ProgressEdit>
+
+
+// MARK: -
+// MARK: All model edits
+
+/// Merged edits
+///
+enum Edit {
+  case goalEdit(edit: GoalEdit)
+  case progressEdit(edit: ProgressEdit)
+}
+
+extension Edit {
+
+  init(goalOrProgressEdit: Either<GoalEdit, ProgressEdit>) {
+    switch goalOrProgressEdit {
+    case .left(let goalEdit):      self = .goalEdit(edit: goalEdit)
+    case .right(let progressEdit): self = .progressEdit(edit: progressEdit)
+    }
+  }
+
+  func transform(_ goals: Goals) -> Goals {
+
+    switch self {
+    case .goalEdit(let goalEdit):         return goalEdit.transform(goals)
+    case .progressEdit(let progressEdit): return progressEdit.transform(goals)
+    }
+  }
+}
+
+typealias Edits = Changes<Edit>
+
+
+// MARK: -
+// MARK: Complete app model
+
+struct GoalsModel {
+
+  // The two types of edit streams
+  //
+  let goalEdits     = GoalEdits(),
+      progressEdits = ProgressEdits()
+
+  /// Combined edits
+  ///
+  let edits: Edits
+
+
+  /// The current model value is determined by accumulating all edits.
+  ///
+  let model: Changing<Goals>
+
+  init(initial: Goals) {
+
+      // Create the change propagation network
+    // FIXME: EXERCISE: change next two lines to wire up the streams
+    edits = Edits()
+    model = edits.accumulate(startingFrom: initial){ edit, currentGoals in
+              return currentGoals
+            }
+  }
+}

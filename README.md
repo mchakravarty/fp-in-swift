@@ -12,6 +12,8 @@ NB: The first two talks miss the FRP component as this is covered, in more detai
 
 **Goals.app**
 
+The `Goals-EXERCISE` directory contains an exercise version of [Goals.app](https://github.com/mchakravarty/goalsapp), the running example from the second and third talk listed above.
+
 **SwiftCheck**
 
 This repository contains the [SwiftCheck]() property-based testing framework as a submodule.
