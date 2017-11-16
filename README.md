@@ -3,8 +3,8 @@
 This repository contains the supporting material for the workshop [Functional Programming in Swift](https://functionalconf.com/proposal.html?id=4054) to be held as part of [Functional Conf](https://functionalconf.com), Bangalore, 2017.
 
 Talks
-1. [Functional Programming in a Stateful World]()
-2. [A Type is Worth a Thousand Tests]()
-3. [Do-It-Yourself Functional Reactive Programming]()
+1. [Functional Programming in a Stateful World](https://github.com/mchakravarty/fp-in-swift/raw/master/talk-slides/FP-Stateful.pdf)
+2. [A Type is Worth a Thousand Tests](https://github.com/mchakravarty/fp-in-swift/raw/master/talk-slides/one-type-thousand-tests.pdf)
+3. [Do-It-Yourself Functional Reactive Programming](https://github.com/mchakravarty/fp-in-swift/raw/master/talk-slides/DIY-FRP.pdf)
 
 NB: The first two talks miss the FRP component as this is covered, in more detail, in the third.
