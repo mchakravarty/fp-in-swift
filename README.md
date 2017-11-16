@@ -9,3 +9,9 @@ This repository contains the supporting material for the workshop [Functional Pr
 3. [Do-It-Yourself Functional Reactive Programming](https://github.com/mchakravarty/fp-in-swift/raw/master/talk-slides/DIY-FRP.pdf)
 
 NB: The first two talks miss the FRP component as this is covered, in more detail, in the third talk.
+
+**Goals.app**
+
+**SwiftCheck**
+
+This repository contains the [SwiftCheck]() property-based testing framework as a submodule.
